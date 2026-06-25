@@ -14,57 +14,73 @@ const client = new Client({
         GatewayIntentBits.MessageContent
     ]
 });
+
 client.once('ready', () => {
     console.log(`${client.user.tag} شغال`);
 });
 
-client.on('guildMemberAdd', async member => {
+client.on('guildMemberAdd', async (member) => {
 
-    // حط آيدي روم الترحيب هنا
+    console.log(`${member.user.tag} دخل السيرفر`);
+
+    // آيدي روم الترحيب
     const channel = member.guild.channels.cache.get('1510694717107601561');
 
-    if (!channel) return;
+    if (!channel) {
+        console.log('لم يتم العثور على روم الترحيب');
+        return;
+    }
 
-    // إنشاء الصورة
-    const canvas = Canvas.createCanvas(1000, 500);
-    const ctx = canvas.getContext('2d');
+    try {
 
-    // الخلفية
-    const background = await Canvas.loadImage('./images/background.png');
-    ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+        // إنشاء الصورة
+        const canvas = Canvas.createCanvas(1000, 500);
+        const ctx = canvas.getContext('2d');
 
-    // اسم العضو
-    ctx.font = 'bold 60px sans-serif';
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(member.user.username, 300, 120);
+        // الخلفية
+        const background = await Canvas.loadImage('./images/background.png');
+        ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
-    // رسالة الترحيب
-    ctx.font = '40px sans-serif';
-    ctx.fillText('WELCOME TO VOID', 300, 70);
+        // رسالة الترحيب
+        ctx.font = '40px sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText('WELCOME TO VOID', 300, 70);
 
-    // صورة العضو
-    const avatar = await Canvas.loadImage(
-        member.user.displayAvatarURL({ extension: 'png', size: 256 })
-    );
+        // اسم العضو
+        ctx.font = 'bold 60px sans-serif';
+        ctx.fillText(member.user.username, 300, 140);
 
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(120, 100, 70, 0, Math.PI * 2, true);
-    ctx.closePath();
-    ctx.clip();
-    ctx.drawImage(avatar, 50, 30, 140, 140);
-    ctx.restore();
+        // صورة العضو
+        const avatar = await Canvas.loadImage(
+            member.user.displayAvatarURL({
+                extension: 'png',
+                size: 256
+            })
+        );
 
-    const attachment = new AttachmentBuilder(
-        canvas.toBuffer(),
-        { name: 'welcome.png' }
-    );
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(120, 100, 70, 0, Math.PI * 2, true);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(avatar, 50, 30, 140, 140);
+        ctx.restore();
 
-    channel.send({
-        content: `🎉 أهلاً وسهلاً ${member}`,
-        files: [attachment]
-    });
+        const attachment = new AttachmentBuilder(
+            canvas.toBuffer(),
+            { name: 'welcome.png' }
+        );
+
+        await channel.send({
+            content: `𝐖𝐞𝐥𝐜𝐨𝐦𝐞 𝐭𝐨 𝐕𝐎𝐈𝐃 ${member}`,
+            files: [attachment]
+        });
+
+        console.log('تم إرسال رسالة الترحيب');
+
+    } catch (error) {
+        console.error('خطأ في الترحيب:', error);
+    }
 });
 
-// حط توكن البوت هنا
 client.login(process.env.TOKEN);
