@@ -9,10 +9,11 @@ const Canvas = require('canvas');
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMembers
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent
     ]
 });
-
 client.once('ready', () => {
     console.log(`${client.user.tag} شغال`);
 });
